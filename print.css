@@ -1,0 +1,39 @@
+.site-header,
+.site-footer,
+.profile-actions,
+.paper-side {
+  display: none;
+}
+
+body {
+  color: #000;
+  font-size: 11pt;
+}
+
+main {
+  width: 100%;
+}
+
+.profile,
+.section,
+.paper {
+  border-color: #777;
+  padding: 18pt 0;
+}
+
+a {
+  color: #000;
+  text-decoration: none;
+}
+
+h1 {
+  font-size: 24pt;
+}
+
+h2 {
+  font-size: 16pt;
+}
+
+h3 {
+  font-size: 13pt;
+}
