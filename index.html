@@ -12,6 +12,38 @@
     <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="print.css" media="print">
+
+    <!-- JMP Feedback Widget Styles -->
+    <style>
+      .jmp-feedback-btn{display:inline-flex;align-items:center;gap:5px;margin-left:14px;padding:3px 11px 3px 9px;font-size:0.82rem;font-family:inherit;color:#1a5276;background:transparent;border:1px solid #1a5276;border-radius:4px;cursor:pointer;vertical-align:middle;transition:background 0.15s,color 0.15s}
+      .jmp-feedback-btn:hover{background:#1a5276;color:#fff}
+      .jmp-feedback-btn svg{width:13px;height:13px;flex-shrink:0}
+      .jmp-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.42);z-index:9999;align-items:center;justify-content:center;padding:20px}
+      .jmp-modal-overlay.open{display:flex}
+      .jmp-modal{background:#fff;border-radius:10px;padding:28px 30px 24px;max-width:460px;width:100%;box-shadow:0 8px 40px rgba(0,0,0,0.18);position:relative}
+      .jmp-modal-title{font-size:1rem;font-weight:600;color:#1a1a1a;margin:0 0 4px}
+      .jmp-modal-sub{font-size:0.8rem;color:#666;margin:0 0 16px}
+      .jmp-modal textarea{width:100%;box-sizing:border-box;min-height:110px;resize:vertical;border:1px solid #c8c8c8;border-radius:6px;padding:10px 12px;font-size:0.9rem;color:#222;line-height:1.5;outline:none;transition:border-color 0.15s}
+      .jmp-modal textarea:focus{border-color:#1a5276}
+      .jmp-modal textarea::placeholder{color:#aaa}
+      .jmp-chips{display:flex;flex-wrap:wrap;gap:7px;margin:12px 0 16px}
+      .jmp-chip{padding:3px 11px;border:1px solid #c8c8c8;border-radius:20px;font-size:0.78rem;color:#555;cursor:pointer;transition:all 0.12s;user-select:none;background:#fff}
+      .jmp-chip:hover{border-color:#1a5276;color:#1a5276}
+      .jmp-chip.active{border-color:#1a5276;background:#1a5276;color:#fff}
+      .jmp-actions{display:flex;justify-content:flex-end;align-items:center;gap:10px;margin-top:4px}
+      .jmp-cancel-btn{font-size:0.85rem;color:#666;background:none;border:none;cursor:pointer;padding:6px 10px}
+      .jmp-cancel-btn:hover{color:#222}
+      .jmp-submit-btn{padding:7px 20px;font-size:0.85rem;font-weight:600;color:#fff;background:#1a5276;border:none;border-radius:5px;cursor:pointer;transition:background 0.15s}
+      .jmp-submit-btn:hover{background:#154360}
+      .jmp-submit-btn:disabled{background:#9bb5c4;cursor:not-allowed}
+      .jmp-status{font-size:0.82rem;margin-top:10px;min-height:18px}
+      .jmp-status.success{color:#1e8449}
+      .jmp-status.error{color:#c0392b}
+      .jmp-close{position:absolute;top:14px;right:16px;font-size:1.1rem;color:#aaa;background:none;border:none;cursor:pointer;line-height:1}
+      .jmp-close:hover{color:#333}
+      .jmp-anon-note{font-size:0.75rem;color:#999;margin-top:14px;display:flex;align-items:center;gap:5px}
+      .jmp-anon-note svg{width:11px;height:11px;flex-shrink:0}
+    </style>
   </head>
   <body>
     <header class="site-header">
@@ -66,13 +98,11 @@
 
       <section class="section" id="research" aria-labelledby="research-heading">
         <div class="section-heading">
-
           <h2 id="research-heading">Research</h2>
         </div>
 
         <article class="paper jmp">
           <div class="paper-main">
-
             <h3>Alliance Capacity Sharing and Market Congestion in Container Shipping</h3>
             <p class="paper-authors">With Anhua Chen &middot; October 2026</p>
             <p>
@@ -94,9 +124,44 @@
             </p>
             <div class="paper-links">
               <a href="papers/Zhuang_JMP_Capacity_Risk.pdf">Paper PDF</a>
+
+              <!-- JMP Feedback Button -->
+              <button class="jmp-feedback-btn" onclick="document.getElementById('jmpFeedbackModal').classList.add('open')" aria-label="Share your thoughts on this paper">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                Share your thoughts
+              </button>
             </div>
           </div>
         </article>
+
+        <!-- Feedback Modal -->
+        <div id="jmpFeedbackModal" class="jmp-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="jmpModalTitle">
+          <div class="jmp-modal">
+            <button class="jmp-close" onclick="closeJmpModal()" aria-label="Close">&times;</button>
+            <p class="jmp-modal-title" id="jmpModalTitle">Share your thoughts on this paper</p>
+            <p class="jmp-modal-sub">Your comment is anonymous and goes directly to the author.</p>
+            <div class="jmp-chips" id="jmpChips">
+              <span class="jmp-chip" data-val="General comment" onclick="toggleChip(this)">💬 General</span>
+              <span class="jmp-chip" data-val="Model / theory" onclick="toggleChip(this)">📐 Model / theory</span>
+              <span class="jmp-chip" data-val="Empirics / data" onclick="toggleChip(this)">📊 Empirics</span>
+              <span class="jmp-chip" data-val="Writing / clarity" onclick="toggleChip(this)">✏️ Writing</span>
+              <span class="jmp-chip" data-val="Policy relevance" onclick="toggleChip(this)">🏛️ Policy</span>
+            </div>
+            <textarea id="jmpFeedbackText"
+              placeholder="A question, suggestion, or reaction — anything helps."
+              oninput="document.getElementById('jmpSubmitBtn').disabled=this.value.trim().length<5">
+            </textarea>
+            <div class="jmp-actions">
+              <button class="jmp-cancel-btn" onclick="closeJmpModal()">Cancel</button>
+              <button class="jmp-submit-btn" id="jmpSubmitBtn" disabled onclick="submitJmpFeedback()">Send</button>
+            </div>
+            <div class="jmp-status" id="jmpStatus"></div>
+            <div class="jmp-anon-note">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              No personal data collected. Comments forwarded to author by email.
+            </div>
+          </div>
+        </div>
 
         <article class="paper compact">
           <h3>Owning or Leasing? The Role of Capital Leasing Market in the Investment Cycle</h3>
@@ -114,7 +179,6 @@
 
       <section class="section two-column" id="teaching" aria-labelledby="teaching-heading">
         <div class="section-heading">
-
           <h2 id="teaching-heading">Teaching</h2>
         </div>
         <div class="list-block">
@@ -137,7 +201,6 @@
 
       <section class="section two-column" id="cv" aria-labelledby="cv-heading">
         <div class="section-heading">
-
           <h2 id="cv-heading">CV</h2>
         </div>
         <div class="materials">
@@ -150,7 +213,6 @@
 
       <section class="section two-column" id="contact" aria-labelledby="contact-heading">
         <div class="section-heading">
-
           <h2 id="contact-heading">Get in Touch</h2>
         </div>
         <address class="contact-card">
@@ -167,5 +229,88 @@
       <span>Last updated October 2026</span>
       <a href="#top">Back to top</a>
     </footer>
+
+    <!-- JMP Feedback Widget Script -->
+    <script>
+      // ⚠️ 替换成你的 Formspree endpoint
+      // 去 https://formspree.io 注册，新建一个 form，把 URL 粘贴到这里
+      var JMP_FORMSPREE_ENDPOINT = 'YOUR_FORMSPREE_ENDPOINT';
+
+      function toggleChip(el) {
+        if (el) el.classList.toggle('active');
+      }
+
+      function closeJmpModal() {
+        document.getElementById('jmpFeedbackModal').classList.remove('open');
+        document.getElementById('jmpFeedbackText').value = '';
+        document.getElementById('jmpSubmitBtn').disabled = true;
+        document.getElementById('jmpStatus').textContent = '';
+        document.getElementById('jmpStatus').className = 'jmp-status';
+        document.querySelectorAll('#jmpChips .jmp-chip').forEach(function(c) {
+          c.classList.remove('active');
+        });
+      }
+
+      document.getElementById('jmpFeedbackModal').addEventListener('click', function(e) {
+        if (e.target === this) closeJmpModal();
+      });
+
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeJmpModal();
+      });
+
+      function submitJmpFeedback() {
+        var text = document.getElementById('jmpFeedbackText').value.trim();
+        if (text.length < 5) return;
+
+        var chips = document.querySelectorAll('#jmpChips .jmp-chip.active');
+        var category = chips.length > 0
+          ? Array.from(chips).map(function(c) { return c.dataset.val; }).join(', ')
+          : 'General comment';
+
+        var btn    = document.getElementById('jmpSubmitBtn');
+        var status = document.getElementById('jmpStatus');
+        btn.disabled = true;
+        btn.textContent = 'Sending…';
+
+        if (!JMP_FORMSPREE_ENDPOINT || JMP_FORMSPREE_ENDPOINT === 'YOUR_FORMSPREE_ENDPOINT') {
+          status.textContent = '⚠️ Formspree endpoint not configured yet.';
+          status.className = 'jmp-status error';
+          btn.disabled = false;
+          btn.textContent = 'Send';
+          return;
+        }
+
+        fetch(JMP_FORMSPREE_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({
+            _subject: '[JMP Feedback] ' + category,
+            category: category,
+            comment:  text,
+            paper:    'Alliance Capacity Sharing and Market Congestion in Container Shipping',
+            sent_at:  new Date().toISOString()
+          })
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          if (data.ok) {
+            status.textContent = '✓ Sent — thank you for your feedback!';
+            status.className = 'jmp-status success';
+            document.getElementById('jmpFeedbackText').value = '';
+            btn.textContent = 'Send';
+            setTimeout(closeJmpModal, 2200);
+          } else {
+            throw new Error(data.error || 'Failed');
+          }
+        })
+        .catch(function() {
+          status.textContent = '✗ Could not send — please email xzz5410@psu.edu directly.';
+          status.className = 'jmp-status error';
+          btn.disabled = false;
+          btn.textContent = 'Send';
+        });
+      }
+    </script>
   </body>
 </html>
